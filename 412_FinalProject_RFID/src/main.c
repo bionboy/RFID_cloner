@@ -9,6 +9,11 @@
  */
 
 #include <asf.h>
+#include <avr/io.h>
+#include <stdlib.h>
+#include <util/delay.h>
+
+#include "usart_mega.h"
 
 int main (void)
 {
@@ -18,8 +23,16 @@ int main (void)
 	// INIT BOARD
 	board_init();
 	
+	//const usart_spi_options  SPI_OPTS = {
+		//USART_BAUD_9600,
+		//
+	//};
+	
+	
 	// LOGIC
 	
 	// TODO: Setup SPI for RFID
+	//USART0_Init();
 	
+	while(1){};
 }
