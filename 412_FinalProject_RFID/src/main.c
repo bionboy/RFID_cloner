@@ -1,40 +1,22 @@
-/*
- * -# Include the ASF header files (through asf.h)
- * -# "Insert system clock initialization code here" comment
- * -# Minimal main function that starts with a call to board_init()
- * -# "Insert application code here" comment
- *
- * Include header files for all drivers that have been imported from
- * Atmel Software Framework (ASF).
- */
-//
 //15 SPI_SS_A Slave A select for SPI
-//16 SPI_MOSI Master out slave in line of serial peripheral interface
-//17 SPI_MISO Master in slave out line of serial peripheral interface
-//18 SPI_SCK Clock for serial peripheral interface
 
 #include <asf.h>
 #include <avr/io.h>
 #include <stdlib.h>
 //#include <util/delay.h>
-
 #include "usart_mega.h"
 
-// UART
-//#define FOSC 1843200 // Clock Speed
+//// UART CONST ////
 #define FOSC 15974400 // Clock Speed
 #define BAUD 9600
 #define MYUBRR FOSC/16/BAUD-1
 
-// SPI pins
-#define DDR_SPI DDRB
-#define SS		DDB2
-#define DD_MOSI DDB3
-#define DD_MISO DDB4
-#define DD_SCK	DDB5
-#define SPCR	SPCR0
-#define SPDR	SPDR0
-#define SPSR	SPSR0
+//// SPI CONST ////
+#define SPI_DDR DDRB
+//#define SS		DDB2
+//#define SPCR	SPCR0
+//#define SPDR	SPDR0
+//#define SPSR	SPSR0
 
 void Setup(void);
 void USART_Init(unsigned int);
@@ -68,7 +50,7 @@ void Setup()
 	sysclk_init();
 	// INIT BOARD
 	board_init();	// INIT USART	USART_Init(MYUBRR);	// INIT SPI
-	//SPI_MasterInit();
+	SPI_MasterInit();
 }
 
 
@@ -80,9 +62,9 @@ void USART_Init(unsigned int ubrr)
 	UBRR0H = (unsigned char)(ubrr>>8);
 	UBRR0L = (unsigned char)ubrr;
 	// Enable receiver and transmitter
-	UCSR0B = (1<<RXEN0)|(1<<TXEN0);
+	UCSR0B = (1 << RXEN0) | (1 << TXEN0);
 	// Set frame format: 8data, 2stop bit
-	UCSR0C = (1<<USBS0)|(3<<UCSZ00);
+	UCSR0C = (1 << USBS0) | (3 << UCSZ00);
 }void USART_Transmit(unsigned char data)
 {
 	/* Wait for empty transmit buffer */
@@ -99,22 +81,22 @@ void USART_Init(unsigned int ubrr)
 void SPI_MasterInit()
 {
 	// Set MOSI and SCK output, all others input
-	DDR_SPI = (1<<DD_MOSI)|(1<<DD_SCK);
+	SPI_DDR = (1 << SPI_MOSI) | (1 << SPI_SCK);
 	// Enable SPI, Master, set clock rate fck/16
-	SPCR = (1<<SPE)|(1<<MSTR)|(1<<SPR0);
+	SPCR0 = (1 << SPE) | (1 << MSTR) | (1 << SPR0);
 }
 
 void SPI_MasterTransmit(char cData)
 {
 	// Start transmission
-	SPDR = cData;
+	SPDR0 = cData;
 	// Wait for transmission complete
-	while(!(SPSR & (1<<SPIF))){};
+	while(!(SPSR0 & (1 << SPIF))){};
 }
 
 char SPI_MasterReceive()
 {
 	// Wait for reception complete
-	while(!(SPSR & (1<<SPIF))){};
-	// Return Data Register	return SPDR;
+	while(!(SPSR0 & (1 << SPIF))){};
+	// Return Data Register	return SPDR0;
 }
